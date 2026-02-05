@@ -153,10 +153,10 @@ function showScene() {
 function showQuestion() {
   changeBackground(questionBg);
   content.innerHTML = `
-    <h1 class="show">Budeš moja valentínka? 💕</h1>
+    <h1 class="show">Budeš moja valentínka? </h1>
     <div class="buttons-box">
-      <button id="yes">Áno</button>
-      <button id="no">Nie</button>
+      <button id="yes">Áno :3</button>
+      <button id="no">Nie :(</button>
     </div>
   `;
   const yes = document.getElementById("yes");
@@ -178,8 +178,8 @@ function showQuestion() {
 }
 
 function celebrate() {
-  content.innerHTML = "<h1 class='show'>Ďakujem 💖</h1>";
-  const msg = new SpeechSynthesisUtterance("Yippee!");
+  content.innerHTML = "<h1 class='show'>YIPPPEEE Milujem ťa upírik</h1>";
+  const msg = new SpeechSynthesisUtterance("Yippeeeee!");
   speechSynthesis.speak(msg);
   for (let i = 0; i < 80; i++) {
     const el = document.createElement("div");
@@ -198,3 +198,4 @@ showScene();
 
 </body>
 </html>
+
