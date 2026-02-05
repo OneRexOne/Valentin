@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<title>Mojej ženuške</title>
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+/* POZADIA */
+.bg {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 1.5s ease;
+  z-index: -1;
+}
+#bg1 { opacity: 1; }
+#bg2 { opacity: 0; }
+
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  z-index: 10;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+h1 {
+  font-size: 3em;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  margin-bottom: 30px;
+}
+h1.show { opacity: 1; }
+
+.buttons-box {
+  position: relative;
+  width: 420px;
+  height: 220px;
+  margin: 0 auto;
+}
+
+button {
+  font-size: 1.4em;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  position: absolute;
+}
+
+/* ÁNO */
+#yes {
+  --yes-scale: 1;
+  transform: scale(var(--yes-scale));
+  background: #ff4d6d;
+  color: white;
+  left: 30px;
+  top: 90px;
+  animation: beg 1.5s infinite;
+}
+
+@keyframes beg {
+  0%   { transform: scale(calc(var(--yes-scale) * 1)); }
+  50%  { transform: scale(calc(var(--yes-scale) * 1.12)) rotate(-2deg); }
+  100% { transform: scale(calc(var(--yes-scale) * 1)); }
+}
+
+/* NIE */
+#no {
+  background: #555;
+  color: #ddd;
+  right: 30px;
+  top: 95px;
+  animation: sad 2.5s infinite;
+}
+
+@keyframes sad {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+/* KONFETY */
+.celebrate {
+  position: absolute;
+  font-size: 2em;
+  animation: rise 4s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes rise {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-120vh); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg1" class="bg"></div>
+<div id="bg2" class="bg"></div>
+
+<div class="center" id="content">
+  <h1 id="text"></h1>
+</div>
+
+<script>
+const scenes = [
+  { text: "Tak upírik, už to sú 2 mesiace čo sme oficiálne spolu", time: 3000, bg: "images/1.jpg" },
+  { text: "2 mesiace čo ma robíš neskutočne šťastným", time: 3500, bg: "images/2.jpg" },
+  { text: "Síce nie sme pri sebe každú sekundu", time: 4000, bg: "images/3.jpg" },
+  { text: "Ale aj tak pociťujem lásku ako nikdy predtým", time: 4000, bg: "images/4.jpg" },
+  { text: "Tak som sa chcel opýtať…", time: 3500, bg: "images/5.jpg" }
+];
+const questionBg = "images/question.jpg";
+
+let index = 0, activeBg = 1, scale = 1;
+
+const textEl = document.getElementById("text");
+const content = document.getElementById("content");
+const bg1 = document.getElementById("bg1");
+const bg2 = document.getElementById("bg2");
+
+function changeBackground(src) {
+  const next = activeBg === 1 ? bg2 : bg1;
+  const current = activeBg === 1 ? bg1 : bg2;
+  next.style.backgroundImage = `url(${src})`;
+  next.style.opacity = 1;
+  current.style.opacity = 0;
+  activeBg = activeBg === 1 ? 2 : 1;
+}
+
+function showScene() {
+  if (index >= scenes.length) return showQuestion();
+  changeBackground(scenes[index].bg);
+  textEl.innerText = scenes[index].text;
+  textEl.classList.add("show");
+  setTimeout(() => textEl.classList.remove("show"), scenes[index].time - 1500);
+  setTimeout(() => { index++; showScene(); }, scenes[index].time);
+}
+
+function showQuestion() {
+  changeBackground(questionBg);
+  content.innerHTML = `
+    <h1 class="show">Budeš moja valentínka? 💕</h1>
+    <div class="buttons-box">
+      <button id="yes">Áno</button>
+      <button id="no">Nie</button>
+    </div>
+  `;
+  const yes = document.getElementById("yes");
+  const no = document.getElementById("no");
+  const box = document.querySelector(".buttons-box");
+
+  function moveNo() {
+    const maxX = box.clientWidth - no.offsetWidth;
+    const maxY = box.clientHeight - no.offsetHeight;
+    no.style.left = Math.random() * maxX + "px";
+    no.style.top = Math.random() * maxY + "px";
+    scale += 0.12;
+    yes.style.setProperty("--yes-scale", scale);
+  }
+
+  no.addEventListener("mouseover", moveNo);
+  no.addEventListener("touchstart", moveNo);
+  yes.addEventListener("click", celebrate);
+}
+
+function celebrate() {
+  content.innerHTML = "<h1 class='show'>Ďakujem 💖</h1>";
+  const msg = new SpeechSynthesisUtterance("Yippee!");
+  speechSynthesis.speak(msg);
+  for (let i = 0; i < 80; i++) {
+    const el = document.createElement("div");
+    el.className = "celebrate";
+    el.innerText = Math.random() > 0.5 ? "💖" : "🎊";
+    el.style.left = Math.random() * 100 + "vw";
+    el.style.top = "100vh";
+    el.style.animationDuration = 2 + Math.random() * 3 + "s";
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 5000);
+  }
+}
+
+showScene();
+</script>
+
+</body>
+</html>
